@@ -8,34 +8,65 @@ public class Enemy : MonoBehaviour
     public NavMeshAgent badGuy;
 
     public float squareOffmovement = 20f;
-
     public float xMin;
     public float xMax;
     public float zMin;
     public float zMax;
-
     private float Xposition;
     private float Yposition;
     private float Zposition;
 
     public float closeEnough = 3f;
+    public float sightRange = 10f; // Adjust the sight range as needed
+    private Transform player;
 
+    // Attack variables
+    public int damageAmount = 5;
 
-    // Start is called before the first frame update
     void Start()
     {
         xMin = zMin = -squareOffmovement;
-        zMax = xMax = -squareOffmovement;
+        zMax = xMax = squareOffmovement;
 
         newLocation();
+        player = GameObject.FindGameObjectWithTag("Player").transform; // Assuming the player has the "Player" tag
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(transform.position, new Vector3 (Xposition, Yposition, Zposition)) <= closeEnough)
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+
+        if (distanceToPlayer <= sightRange)
         {
+            // Player is within sight, start following
+            badGuy.SetDestination(player.position);
+
+            if (distanceToPlayer <= closeEnough)
+            {
+                // Player is close enough, attack
+                DealDamageToPlayer();
+            }
+        }
+        else if (Vector3.Distance(transform.position, new Vector3(Xposition, Yposition, Zposition)) <= closeEnough)
+        {
+            // Player is not in sight, find a new location
             newLocation();
+        }
+    }
+
+    void DealDamageToPlayer()
+    {
+        // Assuming your player has a PlayerHealth script attached
+        Playerhealth playerHealth = player.GetComponent<Playerhealth>();
+
+        if (playerHealth != null)
+        {
+            // Deal damage to the player
+            playerHealth.TakeDamage(damageAmount);
+        }
+        else
+        {
+            Debug.LogWarning("Playerhealth script not found on the player GameObject.");
         }
     }
 

@@ -1,50 +1,61 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class Enemyattack : MonoBehaviour
 {
     public Transform Player;
-    public float AttackRange = 6f;
+    public float AttackRange = 2f;
+    public int damageAmount = 5;
 
     private Enemy enemyScript;
-    
-
     public Renderer ren;
     public Material defaultMaterial;
     public Material alertMaterial;
 
     private bool foundPlayer;
 
-
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+        Player = GameObject.FindGameObjectWithTag("Player").transform;
+        enemyScript = GetComponent<Enemy>(); // Assuming you have an Enemy script on the same GameObject
     }
 
-    private void Awake()
-    {
-        Player = GameObject.FindGameObjectWithTag("player").transform;
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(transform.position, Player.position ) <= AttackRange)
+        if (Vector3.Distance(transform.position, Player.position) <= AttackRange)
         {
-            ren.sharedMaterial = alertMaterial; //change material
-            enemyScript.badGuy.SetDestination(Player.position); //chase position of the player
+            // Log to check if the condition is met
+            Debug.Log("Within Attack Range");
+
+            ren.sharedMaterial = alertMaterial;
+            enemyScript.badGuy.SetDestination(Player.position);
             foundPlayer = true;
+
+            // Deal damage to the player
+            DealDamageToPlayer();
         }
         else if (foundPlayer)
         {
-            ren.sharedMaterial = defaultMaterial; //change material
-            enemyScript.newLocation(); //continue on normal path
+            ren.sharedMaterial = defaultMaterial;
+            enemyScript.newLocation();
             foundPlayer = false;
         }
-        
+    }
+
+    void DealDamageToPlayer()
+    {
+        // Assuming your player has a PlayerHealth script attached
+        Playerhealth playerHealth = Player.GetComponent<Playerhealth>();
+
+        if (playerHealth != null)
+        {
+            // Deal damage to the player
+            playerHealth.TakeDamage(damageAmount);
+        }
+        else
+        {
+            Debug.LogWarning("Playerhealth script not found on the player GameObject.");
+        }
     }
 }
