@@ -121,11 +121,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   badGuy: {fileID: 5374238721506980157}
+  squareOffmovement: 20
   xMin: -20
   xMax: 50
   zMin: -20
   zMax: 30
   closeEnough: 3
+  sightRange: 10
+  damageAmount: 10
 --- !u!195 &5374238721506980157
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -162,6 +165,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 0}
   AttackRange: 10
-  ren: {fileID: 6943631874944358575}
-  defaultMaterial: {fileID: 2100000, guid: ca7e1f261f909634da78a900591f652c, type: 2}
-  alertMaterial: {fileID: 2100000, guid: dcea45273f4550e49886d4d82515f38d, type: 2}
+  damageAmount: 10
+  attackCooldown: 3
+  badGuy: {fileID: 0}

@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -41,35 +40,16 @@ public class Enemy : MonoBehaviour
             // Player is within sight, start following
             badGuy.SetDestination(player.position);
 
-            if (distanceToPlayer <= closeEnough)
-            {
-                // Player is close enough, attack
-                DealDamageToPlayer();
-            }
+           
         }
         else if (Vector3.Distance(transform.position, new Vector3(Xposition, Yposition, Zposition)) <= closeEnough)
         {
             // Player is not in sight, find a new location
             newLocation();
         }
+
+
     }
-
-    void DealDamageToPlayer()
-    {
-        // Assuming your player has a PlayerHealth script attached
-        Playerhealth playerHealth = player.GetComponent<Playerhealth>();
-
-        if (playerHealth != null)
-        {
-            // Deal damage to the player
-            playerHealth.TakeDamage(damageAmount);
-        }
-        else
-        {
-            Debug.LogWarning("Playerhealth script not found on the player GameObject.");
-        }
-    }
-
     public void newLocation()
     {
         Xposition = Random.Range(xMin, xMax);
@@ -78,3 +58,5 @@ public class Enemy : MonoBehaviour
         badGuy.SetDestination(new Vector3(Xposition, Yposition, Zposition));
     }
 }
+
+

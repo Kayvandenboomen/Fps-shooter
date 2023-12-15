@@ -1,45 +1,42 @@
-using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
-public class Playerhealth : MonoBehaviour
+public class PlayerHealth : MonoBehaviour
 {
     public int maxHealth = 100;
-    public int currentHealth;
+    private int currentHealth;
+    private TMP_Text Health;
 
-    // Start is called before the first frame update
+    public TMP_Text health;
+
     void Start()
     {
         currentHealth = maxHealth;
+        UpdateHealthUI();
     }
 
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        // Check if the player is dead
-        if (currentHealth <= 0)
-        {
-            Debug.Log("Player has died!");
-            Die();
-        }
+        UpdateHealthUI();
     }
 
-    void Die()
+    public bool IsDead()
     {
-        Debug.Log("Die method called");
-        // The player dies
+        return currentHealth <= 0;
+    }
 
-        GameOverManager gameOverManager = FindObjectOfType<GameOverManager>();
-        if (gameOverManager != null)
+    void UpdateHealthUI()
+    {
+        if (Health != null)
         {
-            gameOverManager.ShowGameOverScreen();
+            Health.text = "Health: " + currentHealth.ToString();
         }
     }
 }
-
-
 
 
 

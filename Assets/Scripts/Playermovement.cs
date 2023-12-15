@@ -11,16 +11,16 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float crouchHeight = 0.5f;
     [SerializeField] private float standingHeight = 2f;
 
-    private Vector3 moveDirection;
     private Vector3 velocity;
+    private CharacterController characterController;
+    private Transform playerModel; // Reference to the player model's transform
+    private bool isCrouching = false;
+
+    private Vector3 moveDirection;
+    
 
     public float gravity = -9.81f;
     public float jumpHeight = 4f;
-
-    private CharacterController characterController;
-    private Transform playerModel; // Reference to the player model's transform
-
-    private bool isCrouching = false;
 
     void Start()
     {
@@ -40,12 +40,22 @@ public class PlayerMovement : MonoBehaviour
             velocity.y = -2f;
         }
 
-        float MoveZ = Input.GetAxis("Vertical");
-        float MoveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
+        float moveX = Input.GetAxis("Horizontal");
 
-        moveDirection = new Vector3(MoveX, 0, MoveZ).normalized;
+        Vector3 forward = Camera.main.transform.forward;
+        Vector3 right = Camera.main.transform.right;
 
-        if (Input.GetKeyDown(KeyCode.C)) // Toggle crouch on C key press
+        forward.y = 0f;
+        right.y = 0f;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 desiredMoveDirection = forward * moveZ + right * moveX;
+        moveDirection = Vector3.Normalize(desiredMoveDirection);
+
+        if (Input.GetKeyDown(KeyCode.C))
         {
             isCrouching = !isCrouching;
 
@@ -64,7 +74,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (characterController.isGrounded)
         {
-            if (Input.GetButtonDown("Jump")) // Jump
+            if (Input.GetButtonDown("Jump"))
             {
                 Jump();
             }
@@ -72,7 +82,7 @@ public class PlayerMovement : MonoBehaviour
 
         characterController.Move(moveDirection * moveSpeed * Time.deltaTime);
 
-        velocity.y += gravity * Time.deltaTime; // Applies gravity
+        velocity.y += gravity * Time.deltaTime;
         characterController.Move(velocity * Time.deltaTime);
     }
 

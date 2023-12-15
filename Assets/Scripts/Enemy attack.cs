@@ -1,61 +1,70 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
-public class Enemyattack : MonoBehaviour
+public class EnemyAttack : MonoBehaviour
 {
     public Transform Player;
     public float AttackRange = 2f;
     public int damageAmount = 5;
+    public float attackCooldown = 6f;
 
     private Enemy enemyScript;
-    public Renderer ren;
-    public Material defaultMaterial;
-    public Material alertMaterial;
+    private Renderer ren;
+    private Material defaultMaterial;
+    private Material alertMaterial;
 
     private bool foundPlayer;
+    private float lastAttackTime;
+
+    public NavMeshAgent badGuy;
 
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player").transform;
-        enemyScript = GetComponent<Enemy>(); // Assuming you have an Enemy script on the same GameObject
+        enemyScript = GetComponent<Enemy>();
+        ren = GetComponent<Renderer>();
+        defaultMaterial = ren.material;
     }
 
     void Update()
     {
-        if (Vector3.Distance(transform.position, Player.position) <= AttackRange)
+        if (Time.time - lastAttackTime >= attackCooldown)
         {
-            // Log to check if the condition is met
-            Debug.Log("Within Attack Range");
-
-            ren.sharedMaterial = alertMaterial;
-            enemyScript.badGuy.SetDestination(Player.position);
-            foundPlayer = true;
-
-            // Deal damage to the player
-            DealDamageToPlayer();
-        }
-        else if (foundPlayer)
-        {
-            ren.sharedMaterial = defaultMaterial;
-            enemyScript.newLocation();
-            foundPlayer = false;
+            if (Vector3.Distance(transform.position, Player.position) <= AttackRange)
+            {
+                Debug.Log("Within Attack Range");
+                ren.sharedMaterial = alertMaterial;
+                enemyScript.badGuy.SetDestination(Player.position);
+                foundPlayer = true;
+                AttackPlayer();
+                lastAttackTime = Time.time;
+            }
+            else if (foundPlayer)
+            {
+                ren.sharedMaterial = defaultMaterial;
+                enemyScript.newLocation();
+                foundPlayer = false;
+            }
         }
     }
 
-    void DealDamageToPlayer()
+    void AttackPlayer()
     {
-        // Assuming your player has a PlayerHealth script attached
-        Playerhealth playerHealth = Player.GetComponent<Playerhealth>();
+        PlayerHealth playerHealth = Player.GetComponent<PlayerHealth>();
 
         if (playerHealth != null)
         {
-            // Deal damage to the player
             playerHealth.TakeDamage(damageAmount);
-        }
-        else
-        {
-            Debug.LogWarning("Playerhealth script not found on the player GameObject.");
+
+            if (playerHealth.IsDead())
+            {
+                // Handle game over logic here
+                Debug.Log("Player has died!");
+                SceneManager.LoadScene("GameOverScreen");
+            }
         }
     }
 }
